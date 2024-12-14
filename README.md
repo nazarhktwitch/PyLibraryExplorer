@@ -1,6 +1,6 @@
 # PyLibrary Explorer
 
-A simple Python application built with `tkinter` to search for Python libraries on PyPI and view their available versions. This application allows users to:
+A simple Python application built with `pyside6` to search for Python libraries on PyPI and view their available versions. This application allows users to:
 - Search for a Python library by name.
 - View the latest version of the library.
 - View all available versions of the library.
@@ -9,10 +9,11 @@ A simple Python application built with `tkinter` to search for Python libraries 
 - Search for libraries on PyPI.
 - Display the latest version of the library.
 - View all available versions of the library.
-- User-friendly graphical interface built with `tkinter`.
+- User-friendly graphical interface built with `pyside6`.
 
 ## Requirements
 - Python 3.x
+- pyside6 (For gui) (First version used tkinter, but pyside6 is more beatiful)
 - `requests` library (for fetching data from PyPI)
 
 ## Installation
@@ -20,7 +21,7 @@ A simple Python application built with `tkinter` to search for Python libraries 
 1. Clone or download the repository.
 2. Install the required dependencies:
    ```bash
-   pip install requests
+   pip install requests pyside6
 Or:
    ```bash
    pip install -r requirements.txt
@@ -28,7 +29,7 @@ Or:
 
 ## Usage
 
-    Run the script using Python:
+    Run the script using Python (Or by double-clicking on it):
 
     python library_explorer.py
 
