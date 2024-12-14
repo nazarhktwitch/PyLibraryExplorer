@@ -1,50 +1,60 @@
 import sys
 import requests
-import tkinter as tk
-from tkinter import messagebox
+from PySide6.QtWidgets import (
+    QApplication, QVBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QMessageBox, QWidget
+)
 
-class LibraryExplorer:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("PyLibrary Explorer")
-        self.root.geometry("500x400")
+class LibraryExplorer(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
 
-        self.search_label = tk.Label(root, text="Search for a Python library by name:")
-        self.search_label.pack(pady=10)
+    def init_ui(self):
+        self.setWindowTitle("PyLibrary Explorer")
+        self.setGeometry(100, 100, 500, 400)
 
-        self.search_input = tk.Entry(root, width=40)
-        self.search_input.pack(pady=10)
+        layout = QVBoxLayout()
 
-        self.search_button = tk.Button(root, text="Search", command=self.search_library)
-        self.search_button.pack(pady=5)
+        self.search_label = QLabel("Search for a Python library by name:")
+        layout.addWidget(self.search_label)
 
-        self.result_list = tk.Listbox(root, width=60, height=10)
-        self.result_list.pack(pady=10)
+        self.search_input = QLineEdit()
+        layout.addWidget(self.search_input)
 
-        self.version_button = tk.Button(root, text="Get Available Versions", command=self.get_versions)
-        self.version_button.pack(pady=5)
+        self.search_button = QPushButton("Search")
+        self.search_button.clicked.connect(self.search_library)
+        layout.addWidget(self.search_button)
+
+        self.result_list = QListWidget()
+        layout.addWidget(self.result_list)
+
+        self.version_button = QPushButton("Get Available Versions")
+        self.version_button.clicked.connect(self.get_versions)
+        layout.addWidget(self.version_button)
+
+        self.setLayout(layout)
 
     def search_library(self):
-        library_name = self.search_input.get().strip()
+        library_name = self.search_input.text().strip()
         if not library_name:
-            messagebox.showwarning("Input Error", "Please enter a library name to search.")
+            QMessageBox.warning(self, "Input Error", "Please enter a library name to search.")
             return
 
         response = requests.get(f"https://pypi.org/pypi/{library_name}/json")
         if response.status_code == 200:
             data = response.json()
             latest_version = data.get("info", {}).get("version", "Unknown")
-            self.result_list.delete(0, tk.END)
-            self.result_list.insert(tk.END, f"Library '{library_name}' is available on PyPI.")
-            self.result_list.insert(tk.END, f"Latest version: {latest_version}")
+            self.result_list.clear()
+            self.result_list.addItem(f"Library '{library_name}' is available on PyPI.")
+            self.result_list.addItem(f"Latest version: {latest_version}")
         else:
-            self.result_list.delete(0, tk.END)
-            self.result_list.insert(tk.END, f"Library '{library_name}' was not found on PyPI.")
+            self.result_list.clear()
+            self.result_list.addItem(f"Library '{library_name}' was not found on PyPI.")
 
     def get_versions(self):
-        library_name = self.search_input.get().strip()
+        library_name = self.search_input.text().strip()
         if not library_name:
-            messagebox.showwarning("Input Error", "Please enter a library name to check versions.")
+            QMessageBox.warning(self, "Input Error", "Please enter a library name to check versions.")
             return
 
         response = requests.get(f"https://pypi.org/pypi/{library_name}/json")
@@ -54,18 +64,19 @@ class LibraryExplorer:
             versions = sorted(releases.keys(), reverse=True)
 
             if versions:
-                self.result_list.delete(0, tk.END)
-                self.result_list.insert(tk.END, f"Available versions for '{library_name}':")
+                self.result_list.clear()
+                self.result_list.addItem(f"Available versions for '{library_name}':")
                 for version in versions:
-                    self.result_list.insert(tk.END, version)
+                    self.result_list.addItem(version)
             else:
-                self.result_list.delete(0, tk.END)
-                self.result_list.insert(tk.END, f"No versions found for '{library_name}'.")
+                self.result_list.clear()
+                self.result_list.addItem(f"No versions found for '{library_name}'.")
         else:
-            self.result_list.delete(0, tk.END)
-            self.result_list.insert(tk.END, f"Library '{library_name}' was not found on PyPI.")
+            self.result_list.clear()
+            self.result_list.addItem(f"Library '{library_name}' was not found on PyPI.")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    explorer = LibraryExplorer(root)
-    root.mainloop()
+    app = QApplication(sys.argv)
+    explorer = LibraryExplorer()
+    explorer.show()
+    sys.exit(app.exec())
